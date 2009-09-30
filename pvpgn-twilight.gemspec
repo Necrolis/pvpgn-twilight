@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = %q{pvpgn-twilight}
-  s.version = "0.0.6"
-  s.date = %q{2009-09-28}
+  s.version = "0.0.7"
+  s.date = %q{2009-09-30}
   s.authors = ["Lorenzo Boccetti"]
   s.email = %q{necrolis@gamil.com}
   s.summary = %q{A ruby interface for Twilight PVPGN}
