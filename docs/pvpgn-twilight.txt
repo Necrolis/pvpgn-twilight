@@ -1,0 +1,30 @@
+= Description
+   A library allowing communication with pvpgn, as well as some optimized versions of pvpgn
+   utility functions
+	
+= Synopsis
+   require 'pvpgn'
+
+   puts PVPGN::BNHash('hello') #will hash to: 2e0236a3649381fe99cdce4b5b59adffa3167c7b
+
+= Module functions
+PVPGN.BNHash(string_to_hash)
+   This will return a string containing the 5 DWORD/UINT long hash required for pvpgn
+   logon authentication, it is automatically converted to lower case
+	
+= Known Bugs  
+   None that I know of.
+      
+= License
+   Artistic 2.0
+        
+= Copyright
+   (C) 2009 Lorenzo Boccetti, The PVPGN Team, All Rights Reserved .
+       
+= Warranty
+   This package is provided "as is" and without any express or
+   implied warranties, including, without limitation, the implied
+   warranties of merchantability and fitness for a particular purpose.
+		
+= Authors
+   Lorenzo Boccetti
