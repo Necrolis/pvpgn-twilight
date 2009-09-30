@@ -1,0 +1,21 @@
+Version 0.0.1
+	- First Release
+	
+Version 0.0.2
+	- Some Fixes to the gemspec
+	
+Version 0.0.3
+	- Removed some static variables from the code
+	- Improved the gem
+
+Version 0.0.4
+	- More Improvements
+	- Added a change log
+	- Added RDocs
+	
+Version 0.0.5
+	- Improved RDocs a little
+	
+Version 0.0.6
+	- Tweaked RDocs
+	- Tweaked source a little
