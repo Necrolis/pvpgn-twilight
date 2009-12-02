@@ -2,4 +2,5 @@
 require 'mkmf'
 
 # Do the work
+cpp_command('g++')
 create_makefile('pvpgn')
