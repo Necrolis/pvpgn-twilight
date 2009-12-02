@@ -26,3 +26,9 @@ Version 0.0.7
 Version 0.0.8
 	- Added G++ compiler specifier 
 	- GitHub repository now defunkt, use GemCutter instead
+	
+Version 0.0.9
+	- extconf.rb updates
+	
+Version 0.1.0
+	- Changed text formats to UNIX style

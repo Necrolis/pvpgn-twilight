@@ -1,4 +1,4 @@
-#define PVPGN_TWILIGHT_VERSION "0.0.6"
+#define PVPGN_TWILIGHT_VERSION "0.1.0"
 
 #ifdef __TEST__
 #include <iostream>
