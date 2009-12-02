@@ -32,3 +32,6 @@ Version 0.0.9
 	
 Version 0.1.0
 	- Changed text formats to UNIX style
+	
+Version 0.1.1
+	- Changed some code to make this Linux/g++ compatable	

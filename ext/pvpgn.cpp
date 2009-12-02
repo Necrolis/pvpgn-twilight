@@ -141,14 +141,13 @@ static void UTILITY_HexToText(char* pBuffer, t_uint32 dwHex, t_uint32 bUpper = 0
 	}
 }
 
-static char* PVPGN_CreateHash(char* pHash, t_sint32 nSize)
+static char* PVPGN_CreateHash(char* pHash, t_sint32 nSize, char pHashOut[41])
 {
     if(pHash == NULL || nSize < 1)
         return NULL;
 
     t_uint32 dwLength = 0, i;        
     unsigned char* pData = (unsigned char*)pHash;
-	char pHashOut[41];
     t_uint32 dwHash[5] = {0x67452301,0xefcdab89,0x98badcfe,0x10325476,0xc3d2e1f0};
     t_uint32 dwTemp[80];
 
@@ -187,15 +186,16 @@ int main(int argc, char *argv[])
 * converted to a lower case string, the input is also automatically
 * converted to lower case
 */
-static VALUE __cdecl RUBY_BNHash(int argc, VALUE* argv, VALUE klass)
+static VALUE RUBY_BNHash(int argc, VALUE* argv, VALUE klass)
 {
+	char szHashOut[41];
 	VALUE vPassword;
 	if(argc != 1)
 		rb_raise(rb_eRuntimeError,"Invalid Amount of Arguments");
 		
 	vPassword = argv[0];
 	char* szPass = StringValuePtr(vPassword);
- 	return rb_str_new2(PVPGN_CreateHash(szPass,strlen(szPass)));
+ 	return rb_str_new2(PVPGN_CreateHash(szPass,strlen(szPass),szHashOut));
 }
 
 void Init_pvpgn()
