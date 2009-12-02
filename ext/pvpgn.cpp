@@ -191,7 +191,7 @@ static VALUE RUBY_BNHash(int argc, VALUE* argv, VALUE klass)
 	char szHashOut[41];
 	VALUE vPassword;
 	if(argc != 1)
-		rb_raise(rb_eRuntimeError,"Invalid Amount of Arguments");
+		rb_raise(rb_eRuntimeError,"RUBY_BNHash(): Invalid Amount of Arguments");
 		
 	vPassword = argv[0];
 	char* szPass = StringValuePtr(vPassword);
