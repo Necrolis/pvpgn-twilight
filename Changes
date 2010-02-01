@@ -35,3 +35,6 @@ Version 0.1.0
 	
 Version 0.1.1
 	- Changed some code to make this Linux/g++ compatable	
+	
+Version 0.2.0
+	- Reverted to C code to avoid some weird linux linkage bug

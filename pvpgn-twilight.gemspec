@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{pvpgn-twilight}
-  s.version = "0.1.1"
+  s.version = "0.2.1"
   s.date = %q{2009-12-02}
   s.authors = ["Lorenzo Boccetti"]
   s.email = %q{necrolis@gamil.com}
@@ -10,5 +10,5 @@ Gem::Specification.new do |s|
   s.files = ["pvpgn-twilight.gemspec","ext/pvpgn.cpp","examples/pvpgn_test.rb","ext/extconf.rb","Changes","docs/pvpgn-twilight.txt","pvpgn-twilight.gemspec"]
   s.extensions << 'ext/extconf.rb'
   s.has_rdoc = true
-  s.extra_rdoc_files = ["Changes","ext/pvpgn.cpp","docs/pvpgn-twilight.txt"]
+  s.extra_rdoc_files = ["Changes","ext/pvpgn.c","docs/pvpgn-twilight.txt"]
 end
