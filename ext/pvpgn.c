@@ -1,38 +1,33 @@
 #define PVPGN_TWILIGHT_VERSION "0.2.1"
 #define PVPGN_TWILIGHT_MODULE "PVPGN"
-
+//#define __TEST__
 /**************************************************/
 /*/												 /*/
 /*/				   Comments & Notes				 /*/
 /*/												 /*/
 /**************************************************/
 /*
-	This is all 1 file for now so that it is easy to use
-	gonna fix it later when stuff gets bigger...
+	Sat, 2 Jan 2010, 8:43am: This is all 1 file for now so that it is easy to use
+							 gonna fix it later when stuff gets bigger...
+	
+	Mon, 1 Feb 2010, 6:12pm: converted core to ANSI C, to avoid wierd
+							linux/ruby linkage bug 
 */
 
 #ifdef __TEST__
-	#include <iostream>
+	#include <stdio.h>
 #else
 	//#include "d2bitstream.h"
 	//#include "twilight.h"
 	#include "ruby.h"
 #endif
 
-#if __cpluspluc
-	typedef unsigned int t_uint32;	//maybe I should use long, keep with win32 DWORD standards, but sizeof(long) == sizeof(int)...
-	typedef signed int t_sint32;
-#else
-	#define t_uint32 unsigned int
-	#define  t_sint32 signed int
-#endif
-
-#define ROTL(x,n,w) (((x)<<((n)&(w-1))) | ((x)>>(((-(n))&(w-1)))))
+#define ROTL(x,n,w) (((x) << ((n) & (w - 1))) | ((x) >> (((-(n)) & (w - 1)))))
 #define ROTL32(x,n) ROTL(x,n,32)
 #define ROTL16(x,n) ROTL(x,n,16)
 
 #define RUBY_Module vModule
-#define RUBY_RegisterFunc(x) rb_define_module_function(RUBY_Module,#x,(VALUE (*)(...))RUBY_##x,-1)	
+#define RUBY_RegisterFunc(x) rb_define_module_function(RUBY_Module,#x,RUBY_##x,-1)	
 
 /**************************************************/
 /*/												 /*/
@@ -40,6 +35,7 @@
 /*/												 /*/
 /**************************************************/
 /*
+//removed pending C conversion :(
 class cD2SaveFile
 {
 	public:
@@ -120,26 +116,32 @@ class cD2SaveFile
 
 //needs the shared stash stuff - more item parsing plus some block management
 
-//removed pending C conversion :(
 /**************************************************/
 /*/												 /*/
 /*/					   PVPGN					 /*/
 /*/												 /*/
 /**************************************************/
 
-static void PVPGN_Hash(t_uint32* pHash, t_uint32* pTemp)
+static void PVPGN_Hash(unsigned long* pHash, unsigned long* pTemp)
 {
-    t_uint32 i;
-
+    unsigned long i;
+    unsigned long a;
+    unsigned long b;
+    unsigned long c;
+    unsigned long d;
+    unsigned long e;
+    unsigned long g;
+	 
     for(i = 0; i < 64; i++)
+    {
         pTemp[i + 16] = ROTL32(1,pTemp[i] ^ pTemp[i + 8] ^ pTemp[i + 2] ^ pTemp[i + 13]);
+	}
 
-    t_uint32 a = pHash[0];
-    t_uint32 b = pHash[1];
-    t_uint32 c = pHash[2];
-    t_uint32 d = pHash[3];
-    t_uint32 e = pHash[4];
-    t_uint32 g;
+    a = pHash[0];
+    b = pHash[1];
+    c = pHash[2];
+    d = pHash[3];
+    e = pHash[4];
 
     for(i = 0; i < 20; i++)
     {
@@ -188,29 +190,33 @@ static void PVPGN_Hash(t_uint32* pHash, t_uint32* pTemp)
     pHash[4] += e;
 }
 
-static void PVPGN_Set16(t_uint32* pDest, const unsigned char* pSource, t_sint32 nSize)
+static void PVPGN_Set16(unsigned long* pDest, const unsigned char* pSource, signed int nSize)
 {   
-    if(pDest == NULL || pSource == NULL || nSize < 0)
+    unsigned long i;
+	unsigned long dwPos;
+	
+    if(pDest == 0 || pSource == 0 || nSize < 0)
+    {
         return;
+	}
         
-    t_uint32 i, dwPos;
     for(dwPos = 0, i = 0; i < 16; i++)
     {
         pDest[i] = 0;
         if(dwPos < nSize)
-	       pDest[i] |= ((t_uint32)pSource[dwPos]);
+	       pDest[i] |= ((unsigned long)pSource[dwPos]);
 	   
         dwPos++;
         if(dwPos < nSize)
-	        pDest[i] |= ((t_uint32)pSource[dwPos]) << 8;
+	        pDest[i] |= ((unsigned long)pSource[dwPos]) << 8;
 
 	    dwPos++;
         if(dwPos < nSize)
-	        pDest[i] |= ((t_uint32)pSource[dwPos]) << 16;
+	        pDest[i] |= ((unsigned long)pSource[dwPos]) << 16;
 
 	    dwPos++;
         if(dwPos < nSize)
-	        pDest[i] |= ((t_uint32)pSource[dwPos]) << 24;
+	        pDest[i] |= ((unsigned long)pSource[dwPos]) << 24;
 	    
         dwPos++;
     }
@@ -218,27 +224,35 @@ static void PVPGN_Set16(t_uint32* pDest, const unsigned char* pSource, t_sint32 
 
 static void UTILITY_ToLower(char* pString)
 {
-	if(pString == NULL)
+    char nChar;
+	if(pString == 0)
+	{
 		return;
+	}
 		
-    char nChar = 0;
     while((nChar = *pString))
+    {
         *pString++ = ((nChar < 'A' || nChar > 'Z') ? nChar : (nChar + 0x20));
+	}
 }
 
-static void UTILITY_HexToText(char* pBuffer, t_uint32 dwHex, t_uint32 bUpper = 0)
+static void UTILITY_HexToText(char* pBuffer, unsigned int dwHex, unsigned int bUpper)
 {
-	if(pBuffer == NULL)
-		return;
-		
 	static const char szHex[] = {'0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
 	static const char szHexU[] = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};	 
-	int i;
+	unsigned long i;
+	
+	if(pBuffer == 0)
+	{
+		return;
+	}
+		
 	if(!bUpper)
 	{
 		for(i = 7; i > -1; i--)
 		{
-			int nChar = dwHex % 16;
+			int nChar;
+			nChar = dwHex % 16;
 			dwHex >>= 4; 
 			pBuffer[i] = szHex[nChar];
 		}
@@ -247,22 +261,26 @@ static void UTILITY_HexToText(char* pBuffer, t_uint32 dwHex, t_uint32 bUpper = 0
 	{
 		for(i = 7; i > -1; i--)
 		{
-			int nChar = dwHex % 16;
+			int nChar;
+			nChar = dwHex % 16;
 			dwHex >>= 4; 
 			pBuffer[i] = szHexU[nChar];
 		}		
 	}
 }
 
-static char* PVPGN_CreateHash(char* pHash, t_sint32 nSize, char pHashOut[41])
+static char* PVPGN_CreateHash(char* pHash, signed int nSize, char pHashOut[41])
 {
-    if(pHash == NULL || nSize < 1)
-        return NULL;
-
-    t_uint32 dwLength = 0, i;        
+    unsigned long dwLength; 
+	unsigned long i;        
     unsigned char* pData = (unsigned char*)pHash;
-    t_uint32 dwHash[5] = {0x67452301,0xefcdab89,0x98badcfe,0x10325476,0xc3d2e1f0};
-    t_uint32 dwTemp[80];
+    unsigned long dwHash[5] = {0x67452301,0xefcdab89,0x98badcfe,0x10325476,0xc3d2e1f0};
+    unsigned long dwTemp[80];
+    
+    if(pHash == 0 || nSize < 1)
+    {
+        return 0;
+	}
 
     pHashOut[40] = 0;
     UTILITY_ToLower(pHash);    
@@ -276,7 +294,9 @@ static char* PVPGN_CreateHash(char* pHash, t_sint32 nSize, char pHashOut[41])
     }
     
     for(i = 0; i < 5; i++)
-    	UTILITY_HexToText(&pHashOut[i * 8],dwHash[i]);
+    {
+    	UTILITY_HexToText(&pHashOut[i * 8],dwHash[i],0);
+	}
       
    	return pHashOut;
 }
@@ -289,10 +309,11 @@ static char* PVPGN_CreateHash(char* pHash, t_sint32 nSize, char pHashOut[41])
 /**************************************************/
 int main(int argc, char *argv[])
 {
-    std::string sInput;
-    std::cout << "Please Enter Password: ";
-    std::cin >> sInput;
-    std::cout << "Hash: " << PVPGN_CreateHash((char*)sInput.c_str(),sInput.size()) << std::endl;
+    char szInput[24];
+    char szHashOut[41];
+    printf("Please Enter Password: ");
+    scanf("Please Enter Password: %s",szInput);
+    printf("Hash: %s\n",PVPGN_CreateHash(szInput,strlen(szInput),szHashOut));
     system("PAUSE");	
     return 0;
 }
@@ -315,19 +336,23 @@ static VALUE RUBY_BNHash(int argc, VALUE* argv, VALUE klass)
 {
 	char szHashOut[41];
 	VALUE vPassword;
+	char* szPass;
+	
 	if(argc != 1)
+	{
 		rb_raise(rb_eRuntimeError,"RUBY_BNHash(): Invalid Argument Count");
+	}
 		
 	vPassword = argv[0];
-	char* szPass = StringValuePtr(vPassword);
+	szPass = StringValuePtr(vPassword);
  	return rb_str_new2(PVPGN_CreateHash(szPass,strlen(szPass),szHashOut));
 }
 
 void Init_pvpgn()
 {
-	VALUE RUBY_Module = rb_define_module(PVPGN_TWILIGHT_MODULE);
-   	//rb_define_module_function(vModule,"BNHash",(VALUE (*)(...))RUBY_BNHash,-1);
+	VALUE RUBY_Module;
+	
+	RUBY_Module = rb_define_module(PVPGN_TWILIGHT_MODULE);
 	RUBY_RegisterFunc(BNHash);	
 }
-
 #endif
