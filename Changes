@@ -38,3 +38,12 @@ Version 0.1.1
 	
 Version 0.2.0
 	- Reverted to C code to avoid some weird linux linkage bug
+	
+Version 0.2.1
+	- Bugs fixes from the conversion
+	
+Version 0.2.2
+	- Added some macros for quick exporting to ruby
+	
+Version 0.2.3
+	- Test release

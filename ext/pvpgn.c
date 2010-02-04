@@ -1,4 +1,4 @@
-#define PVPGN_TWILIGHT_VERSION "0.2.1"
+#define PVPGN_TWILIGHT_VERSION "0.2.3"
 #define PVPGN_TWILIGHT_MODULE "PVPGN"
 //#define __TEST__
 /**************************************************/
@@ -22,12 +22,26 @@
 	#include "ruby.h"
 #endif
 
+//bit rotation macros, instead of the MSVC _rotl and _rotr instrisics(takens from pvpgn)
 #define ROTL(x,n,w) (((x) << ((n) & (w - 1))) | ((x) >> (((-(n)) & (w - 1)))))
 #define ROTL32(x,n) ROTL(x,n,32)
 #define ROTL16(x,n) ROTL(x,n,16)
 
+//The Ruby Module Name
 #define RUBY_Module vModule
-#define RUBY_RegisterFunc(x) rb_define_module_function(RUBY_Module,#x,RUBY_##x,-1)	
+//Register a varibale arg func
+#define RUBY_RegisterFunc(x) rb_define_module_function(RUBY_Module,#x,RUBY_##x,-1)
+//Register a set arg func
+#define RUBY_RegisterFuncEx(x,a) rb_define_module_function(RUBY_Module,#x,RUBY_##x,a)
+//Register a new class, returns a VALUE
+#define RUBY_RegisterClass(c) rb_define_class_under(RUBY_Module,#c,rb_cObject)
+//Register an allocator for this class
+#define RUBY_RegisterClassAlloc(c,x) rb_define_alloc_func(c,x)
+//Register a variable arg func for a class
+#define RUBY_RegisterClassFunc(c,x) rb_define_method(c,#x,x,-1)
+//Register a set arg func for a class
+#define RUBY_RegisterClassFunc(c,x,a) rb_define_method(c,#x,x,a)
+
 
 /**************************************************/
 /*/												 /*/
@@ -100,10 +114,9 @@ class cD2SaveFile
 		return (fFlags & fFlag);
 	}
 
+	//statics
 };*/
 
-	//statics
-	
 	/******* TODO ********/
 	// - base stat parsing
 	// - item parsing
@@ -115,6 +128,8 @@ class cD2SaveFile
 //needs the trading stuff - item parsing basically
 
 //needs the shared stash stuff - more item parsing plus some block management
+
+//needs to be converted into a struct now :/
 
 /**************************************************/
 /*/												 /*/
