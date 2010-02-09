@@ -1,6 +1,6 @@
 #define PVPGN_TWILIGHT_VERSION "0.2.3"
 #define PVPGN_TWILIGHT_MODULE "PVPGN"
-//#define __TEST__
+#define __TEST__ 0
 /**************************************************/
 /*/												 /*/
 /*/				   Comments & Notes				 /*/
@@ -14,7 +14,7 @@
 							linux/ruby linkage bug 
 */
 
-#ifdef __TEST__
+#if ( __TEST__ )
 	#include <stdio.h>
 #else
 	//#include "d2bitstream.h"
@@ -40,7 +40,11 @@
 //Register a variable arg func for a class
 #define RUBY_RegisterClassFunc(c,x) rb_define_method(c,#x,x,-1)
 //Register a set arg func for a class
-#define RUBY_RegisterClassFunc(c,x,a) rb_define_method(c,#x,x,a)
+#define RUBY_RegisterClassFuncEx(c,x,a) rb_define_method(c,#x,x,a)
+//Register a global variable
+#define RUBY_RegisterGlobalVariable(x,y) rb_define_global_const(#x,y)
+//Register a Module Variable
+#define RUBY_RegisterVariable(x,y) rb_define_const(RUBY_Module,#x,y)
 
 
 /**************************************************/
@@ -313,10 +317,10 @@ static char* PVPGN_CreateHash(char* pHash, signed int nSize, char pHashOut[41])
     	UTILITY_HexToText(&pHashOut[i * 8],dwHash[i],0);
 	}
       
-   	return pHashOut;
+   	return &pHashOut[0];
 }
  
-#ifdef __TEST__
+#if ( __TEST__ )
 /**************************************************/
 /*/												 /*/
 /*/					Testing						 /*/
@@ -368,6 +372,7 @@ void Init_pvpgn()
 	VALUE RUBY_Module;
 	
 	RUBY_Module = rb_define_module(PVPGN_TWILIGHT_MODULE);
+	RUBY_RegisterVariable(Version,rb_str_new2(PVPGN_TWILIGHT_VERSION));
 	RUBY_RegisterFunc(BNHash);	
 }
 #endif

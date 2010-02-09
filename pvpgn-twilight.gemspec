@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{pvpgn-twilight}
-  s.version = "0.2.3"
+  s.version = "0.2.4"
   s.date = %q{2010-02-04}
   s.authors = ["Lorenzo 'Necrolis' Boccetti"]
   s.email = %q{necrolis@gamil.com}
