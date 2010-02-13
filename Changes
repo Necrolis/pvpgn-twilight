@@ -51,3 +51,8 @@ Version 0.2.3
 Version 0.2.4
 	- Various fixes
 	- New macro's
+	
+Version 0.2.5
+	- Altered the ruby interface for BNHash
+	- Derolled the loop for HexToText
+	- Temporarily replaced the above with sprintf(...)

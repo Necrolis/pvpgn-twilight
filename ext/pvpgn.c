@@ -1,4 +1,4 @@
-#define PVPGN_TWILIGHT_VERSION "0.2.3"
+#define PVPGN_TWILIGHT_VERSION "0.2.5"
 #define PVPGN_TWILIGHT_MODULE "PVPGN"
 #define __TEST__ 0
 /**************************************************/
@@ -20,9 +20,10 @@
 	//#include "d2bitstream.h"
 	//#include "twilight.h"
 	#include "ruby.h"
+	#include <stdio.h>
 #endif
 
-//bit rotation macros, instead of the MSVC _rotl and _rotr instrisics(takens from pvpgn)
+//bit rotation macros, instead of the MSVC _rotl and _rotr instrisics(taken from pvpgn)
 #define ROTL(x,n,w) (((x) << ((n) & (w - 1))) | ((x) >> (((-(n)) & (w - 1)))))
 #define ROTL32(x,n) ROTL(x,n,32)
 #define ROTL16(x,n) ROTL(x,n,16)
@@ -251,7 +252,7 @@ static void UTILITY_ToLower(char* pString)
 		
     while((nChar = *pString))
     {
-        *pString++ = ((nChar < 'A' || nChar > 'Z') ? nChar : (nChar + 0x20));
+        *pString++ = ((nChar < 'A' || nChar > 'Z') ? nChar : (nChar + ' '));
 	}
 }
 
@@ -288,10 +289,9 @@ static void UTILITY_HexToText(char* pBuffer, unsigned int dwHex, unsigned int bU
 	}
 }
 
-static char* PVPGN_CreateHash(char* pHash, signed int nSize, char pHashOut[41])
+static char* PVPGN_CreateHash(char* pHash, signed int nSize, char* pHashOut)
 {
     unsigned long dwLength; 
-	unsigned long i;        
     unsigned char* pData = (unsigned char*)pHash;
     unsigned long dwHash[5] = {0x67452301,0xefcdab89,0x98badcfe,0x10325476,0xc3d2e1f0};
     unsigned long dwTemp[80];
@@ -301,7 +301,6 @@ static char* PVPGN_CreateHash(char* pHash, signed int nSize, char pHashOut[41])
         return 0;
 	}
 
-    pHashOut[40] = 0;
     UTILITY_ToLower(pHash);    
     while(nSize > 0)
     {
@@ -312,12 +311,17 @@ static char* PVPGN_CreateHash(char* pHash, signed int nSize, char pHashOut[41])
         pData += dwLength;
     }
     
-    for(i = 0; i < 5; i++)
-    {
-    	UTILITY_HexToText(&pHashOut[i * 8],dwHash[i],0);
-	}
-      
-   	return &pHashOut[0];
+    pHashOut[40] = 0;
+   	/*
+	UTILITY_HexToText(&pHashOut[0],dwHash[0],0);
+    UTILITY_HexToText(&pHashOut[8],dwHash[1],0);
+   	UTILITY_HexToText(&pHashOut[16],dwHash[2],0);
+   	UTILITY_HexToText(&pHashOut[24],dwHash[3],0);
+   	UTILITY_HexToText(&pHashOut[32],dwHash[4],0);
+	*/	   	   		  	
+
+	sprintf(pHashOut,"%x%x%x%x%x",dwHash[0],dwHash[1],dwHash[2],dwHash[3],dwHash[4]);
+   	return pHashOut;
 }
  
 #if ( __TEST__ )
@@ -329,7 +333,7 @@ static char* PVPGN_CreateHash(char* pHash, signed int nSize, char pHashOut[41])
 int main(int argc, char *argv[])
 {
     char szInput[24];
-    char szHashOut[41];
+    char szHashOut[64];
     printf("Please Enter Password: ");
     scanf("Please Enter Password: %s",szInput);
     printf("Hash: %s\n",PVPGN_CreateHash(szInput,strlen(szInput),szHashOut));
@@ -351,20 +355,20 @@ int main(int argc, char *argv[])
 * converted to a lower case string, the input is also automatically
 * converted to lower case
 */
-static VALUE RUBY_BNHash(int argc, VALUE* argv, VALUE klass)
+static VALUE RUBY_BNHash(VALUE vPass)
 {
-	char szHashOut[41];
-	VALUE vPassword;
+	static char szHashOut[64];
 	char* szPass;
+	int nSize;
 	
-	if(argc != 1)
+	szPass = StringValuePtr(vPass);
+	if((nSize =	strlen(szPass)) < 1)
 	{
-		rb_raise(rb_eRuntimeError,"RUBY_BNHash(): Invalid Argument Count");
-	}
-		
-	vPassword = argv[0];
-	szPass = StringValuePtr(vPassword);
- 	return rb_str_new2(PVPGN_CreateHash(szPass,strlen(szPass),szHashOut));
+		rb_raise(rb_eRuntimeError,"RUBY_BNHash(): Invalid Password Size");
+	}	
+	
+	PVPGN_CreateHash(szPass,nSize,szHashOut);
+ 	return rb_str_new2(szHashOut);
 }
 
 void Init_pvpgn()
@@ -373,6 +377,6 @@ void Init_pvpgn()
 	
 	RUBY_Module = rb_define_module(PVPGN_TWILIGHT_MODULE);
 	RUBY_RegisterVariable(Version,rb_str_new2(PVPGN_TWILIGHT_VERSION));
-	RUBY_RegisterFunc(BNHash);	
+	RUBY_RegisterFuncEx(BNHash,1);	
 }
 #endif
