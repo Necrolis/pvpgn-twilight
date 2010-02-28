@@ -56,3 +56,6 @@ Version 0.2.5
 	- Altered the ruby interface for BNHash
 	- Derolled the loop for HexToText
 	- Temporarily replaced the above with sprintf(...)
+	
+Version 0.2.6
+	- Fixed a bug with BNHash

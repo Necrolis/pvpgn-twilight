@@ -1,4 +1,4 @@
-#define PVPGN_TWILIGHT_VERSION "0.2.5"
+#define PVPGN_TWILIGHT_VERSION "0.2.6"
 #define PVPGN_TWILIGHT_MODULE "PVPGN"
 #define __TEST__ 0
 /**************************************************/
@@ -30,17 +30,17 @@
 
 //The Ruby Module Name
 #define RUBY_Module vModule
-//Register a varibale arg func
+//Register a varibale arg func(note: has the args of: 'VALUE vThis, int nArgs, VALUE* pArgs') 
 #define RUBY_RegisterFunc(x) rb_define_module_function(RUBY_Module,#x,RUBY_##x,-1)
-//Register a set arg func
+//Register a set arg func(note: arg count excludes the first param: 'VALUE vThis')
 #define RUBY_RegisterFuncEx(x,a) rb_define_module_function(RUBY_Module,#x,RUBY_##x,a)
 //Register a new class, returns a VALUE
 #define RUBY_RegisterClass(c) rb_define_class_under(RUBY_Module,#c,rb_cObject)
 //Register an allocator for this class
 #define RUBY_RegisterClassAlloc(c,x) rb_define_alloc_func(c,x)
-//Register a variable arg func for a class
+//Register a variable arg func for a class(note: has the args of: 'VALUE vThis, int nArgs, VALUE* pArgs') 
 #define RUBY_RegisterClassFunc(c,x) rb_define_method(c,#x,x,-1)
-//Register a set arg func for a class
+//Register a set arg func for a class(note: arg count excludes the first param: 'VALUE vThis')
 #define RUBY_RegisterClassFuncEx(c,x,a) rb_define_method(c,#x,x,a)
 //Register a global variable
 #define RUBY_RegisterGlobalVariable(x,y) rb_define_global_const(#x,y)
@@ -355,16 +355,17 @@ int main(int argc, char *argv[])
 * converted to a lower case string, the input is also automatically
 * converted to lower case
 */
-static VALUE RUBY_BNHash(VALUE vPass)
+static VALUE RUBY_BNHash(VALUE vThis, VALUE vPass)
 {
 	static char szHashOut[64];
 	char* szPass;
 	int nSize;
 	
 	szPass = StringValuePtr(vPass);
-	if((nSize =	strlen(szPass)) < 1)
+	if((nSize = strlen(szPass)) < 1)
 	{
 		rb_raise(rb_eRuntimeError,"RUBY_BNHash(): Invalid Password Size");
+		return rb_str_new2("Invalid Password");
 	}	
 	
 	PVPGN_CreateHash(szPass,nSize,szHashOut);
